@@ -30,7 +30,7 @@ async function meetingHandler(newMeeting) {
   navigator.mediaDevices
     .getUserMedia({
       video: true,
-      audio: false,
+      audio: true,
     })
     .then((stream) => {});
 
@@ -96,12 +96,21 @@ function startMeeting(token, meetingId, name) {
 
   meeting.join();
   participants = meeting.participants;
-  console.log("meeting : ", meeting);
 
   //create Local Participant
   if (totalParticipant == 0) {
     createLocalParticipant();
   }
+
+  //localParticipant Stream
+  meeting.localParticipant.on("stream-enabled", (stream) => {
+    setTrack(
+      stream,
+      document.querySelector(`#v-${meeting.localParticipant.id}`),
+      localParticipantAudio,
+      meeting.localParticipant.id
+    );
+  });
 
   //participant joined
   meeting.on("participant-joined", (participant) => {
@@ -141,29 +150,20 @@ function startMeeting(token, meetingId, name) {
     document.getElementById(`p-${participant.id}`).remove();
   });
 
-  meeting.localParticipant.on("stream-enabled", (stream) => {
-    setTrack(
-      stream,
-      localParticipant,
-      localParticipantAudio,
-      meeting.localParticipant.id
-    );
-  });
-
   addDomEvents();
 }
 
-// function enablePermission(id) {
-//   navigator.mediaDevices
-//     .getUserMedia({
-//       video: true,
-//       // audio: true,
-//     })
-//     .then((stream) => {
-//       document.querySelector(`#v-${id}`).srcObject = stream;
-//       document.querySelector(`#v-${id}`).play();
-//     });
-// }
+function enablePermission(id) {
+  navigator.mediaDevices
+    .getUserMedia({
+      video: true,
+      // audio: true,
+    })
+    .then((stream) => {
+      document.querySelector(`#v-${id}`).srcObject = stream;
+      document.querySelector(`#v-${id}`).play();
+    });
+}
 
 //createLocalParticipant
 function createLocalParticipant() {
@@ -173,13 +173,12 @@ function createLocalParticipant() {
   );
   localParticipantAudio = createAudioElement(meeting.localParticipant.id);
 
-  // enablePermission(meeting.localParticipant.id);
-
   addParticipantToList({
     id: meeting.localParticipant.id,
     displayName: meeting.localParticipant.displayName,
   });
   videoContainer.appendChild(localParticipant);
+  videoContainer.appendChild(localParticipantAudio);
 }
 
 // creating video element
