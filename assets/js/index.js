@@ -27,8 +27,15 @@ async function tokenGeneration() {
 }
 
 async function meetingHandler(newMeeting) {
+  navigator.mediaDevices
+    .getUserMedia({
+      video: true,
+      audio: false,
+    })
+    .then((stream) => {});
+
   let joinMeetingName = "JS-SDK";
-  console.log(newMeeting);
+
   tokenGeneration();
   if (newMeeting) {
     const url = `${API_BASE_URL}/api/meetings`;
@@ -92,7 +99,6 @@ function startMeeting(token, meetingId, name) {
   console.log("meeting : ", meeting);
 
   //create Local Participant
-
   if (totalParticipant == 0) {
     createLocalParticipant();
   }
@@ -147,17 +153,17 @@ function startMeeting(token, meetingId, name) {
   addDomEvents();
 }
 
-function enablePermission(id) {
-  navigator.mediaDevices
-    .getUserMedia({
-      video: true,
-      // audio: true,
-    })
-    .then((stream) => {
-      document.querySelector(`#v-${id}`).srcObject = stream;
-      document.querySelector(`#v-${id}`).play();
-    });
-}
+// function enablePermission(id) {
+//   navigator.mediaDevices
+//     .getUserMedia({
+//       video: true,
+//       // audio: true,
+//     })
+//     .then((stream) => {
+//       document.querySelector(`#v-${id}`).srcObject = stream;
+//       document.querySelector(`#v-${id}`).play();
+//     });
+// }
 
 //createLocalParticipant
 function createLocalParticipant() {
@@ -167,7 +173,7 @@ function createLocalParticipant() {
   );
   localParticipantAudio = createAudioElement(meeting.localParticipant.id);
 
-  enablePermission(meeting.localParticipant.id);
+  // enablePermission(meeting.localParticipant.id);
 
   addParticipantToList({
     id: meeting.localParticipant.id,
@@ -235,15 +241,15 @@ function addParticipantToList({ id, displayName }) {
 
 function setTrack(stream, videoElem, audioElement, id) {
   if (stream.kind == "video") {
-    enablePermission(id);
-    // const mediaStream = new MediaStream();
-    // mediaStream.addTrack(stream.track);
-    // videoElem.srcObject = mediaStream;
-    // videoElem
-    //   .play()
-    //   .catch((error) =>
-    //     console.error("videoElem.current.play() failed", error)
-    //   );
+    // enablePermission(id);
+    const mediaStream = new MediaStream();
+    mediaStream.addTrack(stream.track);
+    videoElem.srcObject = mediaStream;
+    videoElem
+      .play()
+      .catch((error) =>
+        console.error("videoElem.current.play() failed", error)
+      );
   }
   if (stream.kind == "audio") {
     if (id == meeting.localParticipant.id) return;
