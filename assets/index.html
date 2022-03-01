@@ -18,7 +18,7 @@
       crossorigin="anonymous"
     ></script>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="./assets/css/index.css" />
+    <link rel="stylesheet" href="./css/index.css" />
   </head>
   <body>
     <!--join-screen-->
@@ -31,7 +31,7 @@
         id="btnCreateMeeting"
         onclick="meetingHandler(true)"
       >
-        New Meeting
+        Create New Meeting
       </button>
 
       <input
@@ -63,7 +63,7 @@
         <button class="btn btn-dark" id="btnLeaveMeeting">Leave Meeting</button>
       </div>
       <br />
-      <div id="videoContainer" class="row"></div>
+      <div id="videoContainer" class="d-flex flex-row"></div>
       <div
         style="
           position: absolute;
@@ -72,13 +72,10 @@
           height: 50%;
           overflow-y: scroll;
         "
-      >
-        <!-- <h3>Participants List</h3>
-        <div id="participantsList"></div> -->
-      </div>
+      ></div>
     </div>
-    <script src="./assets/js/config.js"></script>
-    <script src="./assets/js/index.js"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/index.js"></script>
     <script src="https://sdk.videosdk.live/js-sdk/0.0.20/videosdk.js"></script>
   </body>
 </html>

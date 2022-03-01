@@ -5,19 +5,16 @@ const API_BASE_URL = "https://api.videosdk.live";
 let btnCreateMeeting = document.getElementById("btnCreateMeeting");
 let btnJoinMeeting = document.getElementById("btnJoinMeeting");
 let videoContainer = document.getElementById("videoContainer");
-let participantsList = document.getElementById("participantsList");
 let btnToggleMic = document.getElementById("btnToggleMic");
 let btnToggleWebCam = document.getElementById("btnToggleWebCam");
+
 //variables
 let meetingId = "";
 let token = "";
 let totalParticipant = 0;
-let participants = [];
-let localParticipant;
-let localParticipantAudio;
 
 //handlers
-async function tokenGeneration() {
+async function tokenValidation() {
   if (TOKEN != "") {
     token = TOKEN;
     console.log("token : ", token);
@@ -26,17 +23,31 @@ async function tokenGeneration() {
   }
 }
 
+<<<<<<< Updated upstream
 async function meetingHandler(newMeeting) {
+  let joinMeetingName = "JS-SDK";
+  console.log(newMeeting);
+  tokenGeneration();
+=======
+function enablePermission() {
   navigator.mediaDevices
     .getUserMedia({
       video: true,
       audio: true,
     })
     .then((stream) => {});
+}
 
+async function meetingHandler(newMeeting) {
   let joinMeetingName = "JS-SDK";
 
-  tokenGeneration();
+  //request permission for accessing media(mic/webcam)
+  enablePermission();
+
+  //token validation
+  tokenValidation();
+
+>>>>>>> Stashed changes
   if (newMeeting) {
     const url = `${API_BASE_URL}/api/meetings`;
     const options = {
@@ -52,32 +63,11 @@ async function meetingHandler(newMeeting) {
     document.getElementById("grid-screen").style.display = "inline-block";
     startMeeting(token, meetingId, joinMeetingName);
   } else {
-    meetingId = await validateMeeting();
+    meetingId = document.getElementById("txtMeetingCode").value;
     document.getElementById("lblMeetingId").value = "Meeting ID : " + meetingId;
     document.getElementById("join-screen").style.display = "none";
     document.getElementById("grid-screen").style.display = "inline-block";
     startMeeting(token, meetingId, joinMeetingName);
-  }
-}
-
-async function validateMeeting() {
-  meetingId = document.getElementById("txtMeetingCode").value;
-  const url = `${API_BASE_URL}/api/meetings/${meetingId}`;
-  const options = {
-    method: "POST",
-    headers: { Authorization: token },
-  };
-
-  const result = await fetch(url, options)
-    .then((response) => response.json()) //result will have meeting id
-    .catch((error) => {
-      console.error("error", error);
-      alert("Invalid Meeting Id");
-      window.location.href = "/";
-      return;
-    });
-  if (result.meetingId === meetingId) {
-    return meetingId;
   }
 }
 
@@ -93,49 +83,42 @@ function startMeeting(token, meetingId, name) {
     webcamEnabled: true, // optional, default: true
     maxResolution: "hd", // optional, default: "hd"
   });
-
   meeting.join();
   participants = meeting.participants;
+  console.log("meeting : ", meeting);
 
+<<<<<<< Updated upstream
   //create Local Participant
+
   if (totalParticipant == 0) {
     createLocalParticipant();
   }
+
+=======
+  createParticipant(meeting.localParticipant);
 
   //localParticipant Stream
   meeting.localParticipant.on("stream-enabled", (stream) => {
     setTrack(
       stream,
       document.querySelector(`#v-${meeting.localParticipant.id}`),
-      localParticipantAudio,
+      document.getElementById(`a-${meeting.localParticipant.id}`),
       meeting.localParticipant.id
     );
   });
 
+>>>>>>> Stashed changes
   //participant joined
   meeting.on("participant-joined", (participant) => {
-    let videoElement = createVideoElement(
-      participant.id,
-      participant.displayName
-    );
-    let audioElement = createAudioElement(participant.id);
-
-    // enablePermission(participant.id);
-
+    createParticipant(participant);
     participant.on("stream-enabled", (stream) => {
       console.log("Stream ENable : ", stream);
       setTrack(
         stream,
         document.querySelector(`#v-${participant.id}`),
-        audioElement,
+        document.getElementById(`a-${participant.id}`),
         participant.id
       );
-    });
-    videoContainer.appendChild(videoElement);
-    videoContainer.appendChild(audioElement);
-    addParticipantToList({
-      id: participant.id,
-      displayName: participant.displayName,
     });
   });
 
@@ -150,35 +133,39 @@ function startMeeting(token, meetingId, name) {
     document.getElementById(`p-${participant.id}`).remove();
   });
 
+  meeting.localParticipant.on("stream-enabled", (stream) => {
+    setTrack(
+      stream,
+      localParticipant,
+      localParticipantAudio,
+      meeting.localParticipant.id
+    );
+  });
+
   addDomEvents();
 }
 
-function enablePermission(id) {
-  navigator.mediaDevices
-    .getUserMedia({
-      video: true,
-      // audio: true,
-    })
-    .then((stream) => {
-      document.querySelector(`#v-${id}`).srcObject = stream;
-      document.querySelector(`#v-${id}`).play();
-    });
-}
-
 //createLocalParticipant
-function createLocalParticipant() {
-  localParticipant = createVideoElement(
-    meeting.localParticipant.id,
-    meeting.localParticipant.displayName
+function createParticipant(participant) {
+  let participantVideo = createVideoElement(
+    participant.id,
+    participant.displayName
   );
+<<<<<<< Updated upstream
   localParticipantAudio = createAudioElement(meeting.localParticipant.id);
+
+  enablePermission(meeting.localParticipant.id);
 
   addParticipantToList({
     id: meeting.localParticipant.id,
     displayName: meeting.localParticipant.displayName,
   });
   videoContainer.appendChild(localParticipant);
-  videoContainer.appendChild(localParticipantAudio);
+=======
+  let participantAudio = createAudioElement(participant.id);
+  videoContainer.appendChild(participantVideo);
+  videoContainer.appendChild(participantAudio);
+>>>>>>> Stashed changes
 }
 
 // creating video element
@@ -200,11 +187,6 @@ function createVideoElement(id, name) {
 
   videoFrame.appendChild(overlay);
   return videoFrame;
-  // let videoElement = document.createElement("video");
-  // videoElement.classList.add("video-frame");
-  // videoElement.setAttribute("id", `v-${pId}`);
-  // videoElement.setAttribute("autoplay", true);
-  // return videoElement;
 }
 
 // creating audio element
@@ -214,33 +196,23 @@ function createAudioElement(pId) {
   audioElement.setAttribute("playsInline", "false");
   audioElement.setAttribute("controls", "false");
   audioElement.setAttribute("id", `a-${pId}`);
-  audioElement.style.visibility = "hidden";
+  audioElement.style.display = "none";
   return audioElement;
-}
-
-//add participant to list
-function addParticipantToList({ id, displayName }) {
-  totalParticipant++;
-  let participantTemplate = document.createElement("div");
-  //refer .participant from index.css
-  participantTemplate.className = "participant";
-
-  //icon
-  let colIcon = document.createElement("div");
-  colIcon.className = "col-2";
-  colIcon.innerHTML = "Icon";
-  participantTemplate.appendChild(colIcon);
-
-  //name
-  let content = document.createElement("div");
-  colIcon.className = "col-3";
-  colIcon.innerHTML = `${displayName}`;
-  participantTemplate.appendChild(content);
 }
 
 function setTrack(stream, videoElem, audioElement, id) {
   if (stream.kind == "video") {
-    // enablePermission(id);
+<<<<<<< Updated upstream
+    enablePermission(id);
+    // const mediaStream = new MediaStream();
+    // mediaStream.addTrack(stream.track);
+    // videoElem.srcObject = mediaStream;
+    // videoElem
+    //   .play()
+    //   .catch((error) =>
+    //     console.error("videoElem.current.play() failed", error)
+    //   );
+=======
     const mediaStream = new MediaStream();
     mediaStream.addTrack(stream.track);
     videoElem.srcObject = mediaStream;
@@ -249,6 +221,7 @@ function setTrack(stream, videoElem, audioElement, id) {
       .catch((error) =>
         console.error("videoElem.current.play() failed", error)
       );
+>>>>>>> Stashed changes
   }
   if (stream.kind == "audio") {
     if (id == meeting.localParticipant.id) return;
