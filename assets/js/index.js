@@ -12,6 +12,9 @@ let btnToggleWebCam = document.getElementById("btnToggleWebCam");
 let meetingId = "";
 let token = "";
 let totalParticipant = 0;
+let stream = {};
+let localParticipantVideo = "";
+let localParticipantAudio = "";
 
 //handlers
 async function tokenValidation() {
@@ -23,32 +26,48 @@ async function tokenValidation() {
   }
 }
 
-function enablePermission() {
-  navigator.mediaDevices
-    .getUserMedia({
-      video: true,
-      audio: true,
-    })
-    .then((stream) => {});
+function createLocalParticipant() {
+  localParticipant = createVideoElement(meeting.localParticipant.id);
+  console.log("video : ", localParticipant);
+  localParticipantAudio = createAudioElement(meeting.localParticipant.id);
+  videoContainer.appendChild(localParticipant);
+}
+
+async function enablePermission() {
+  stream = await navigator.mediaDevices.getUserMedia({
+    video: true,
+    audio: true,
+  });
 }
 
 //createLocalParticipant
 function createParticipant(participant) {
+  //request permission for accessing media(mic/webcam)
+
   let participantVideo = createVideoElement(
     participant.id,
     participant.displayName
   );
+  console.log("participantVideo : ", participantVideo);
 
   let participantAudio = createAudioElement(participant.id);
   videoContainer.appendChild(participantVideo);
   videoContainer.appendChild(participantAudio);
 }
 
+function createLocalParticipant(localParticipant) {
+  localParticipantVideo = createVideoElement(
+    localParticipant.id,
+    localParticipant.displayName
+  );
+
+  localParticipantAudio = createAudioElement(localParticipant.id);
+  videoContainer.appendChild(localParticipantVideo);
+  videoContainer.appendChild(localParticipantAudio);
+}
+
 async function meetingHandler(newMeeting) {
   let joinMeetingName = "JS-SDK";
-
-  //request permission for accessing media(mic/webcam)
-  enablePermission();
 
   //token validation
   tokenValidation();
@@ -108,7 +127,7 @@ function startMeeting(token, meetingId, name) {
 
   //for Local Participant join
   meeting.on("meeting-joined", () => {
-    createParticipant(meeting.localParticipant);
+    createLocalParticipant(meeting.localParticipant);
 
     //local participant stream-enabled
     meeting.localParticipant.on("stream-enabled", (stream) => {
@@ -155,8 +174,6 @@ function startMeeting(token, meetingId, name) {
     //remove it from participant list participantId;
     document.getElementById(`p-${participant.id}`).remove();
   });
-
-  //remote participant joined
 
   addDomEvents();
 
@@ -228,7 +245,7 @@ function createVideoElement(id, name) {
   videoElement.classList.add("video");
   videoElement.setAttribute("id", `v-${id}`);
   videoElement.setAttribute("autoplay", true);
-  videoFrame.appendChild(videoElement);
+  // videoFrame.appendChild(videoElement);
 
   //add overlay
   // let overlay = document.createElement("div");
