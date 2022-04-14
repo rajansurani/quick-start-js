@@ -69,6 +69,7 @@ function createLocalParticipant(localParticipant) {
 async function meetingHandler(newMeeting) {
   let joinMeetingName = "JS-SDK";
 
+  enablePermission();
   //token validation
   tokenValidation();
 
