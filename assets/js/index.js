@@ -88,29 +88,50 @@ function startMeeting(token, meetingId, name) {
     webcamEnabled: true, // optional, default: true
     maxResolution: "hd", // optional, default: "hd"
   });
-  meeting.join();
-  participants = meeting.participants;
-  console.log("meeting : ", meeting);
 
-  //create Local Participant
+  window.ZujoSDK.config(token);
 
-  // if (totalParticipant == 0) {
-  //   createLocalParticipant();
-  // }
-
-  createParticipant(meeting.localParticipant);
-
-  //localParticipant Stream
-  meeting.localParticipant.on("stream-enabled", (stream) => {
-    setTrack(
-      stream,
-      document.querySelector(`#v-${meeting.localParticipant.id}`),
-      document.getElementById(`a-${meeting.localParticipant.id}`),
-      meeting.localParticipant.id
-    );
+  // Meeting Init
+  meeting = window.ZujoSDK.initMeeting({
+    meetingId: meetingId, // required
+    name: name, // required
+    micEnabled: true, // optional, default: true
+    webcamEnabled: true, // optional, default: true
+    maxResolution: "hd", // optional, default: "hd"
   });
 
-  //participant joined
+  //join meeting
+  meeting.join();
+
+  //all remote participants
+  participants = meeting.participants;
+
+  //for Local Participant join
+  meeting.on("meeting-joined", () => {
+    createParticipant(meeting.localParticipant);
+
+    //local participant stream-enabled
+    meeting.localParticipant.on("stream-enabled", (stream) => {
+      setTrack(
+        stream,
+        localParticipant,
+        localParticipantAudio,
+        meeting.localParticipant.id
+      );
+    });
+    //local participant stream-disabled
+    meeting.localParticipant.on("stream-disabled", (stream) => {
+      console.log("local participant stream disabled");
+      setTrack(
+        stream,
+        document.getElementById(`v-${meeting.localParticipant.id}`),
+        document.getElementById(`a-${meeting.localParticipant.id}`),
+        meeting.localParticipant.id
+      );
+    });
+  });
+
+  //for remote participant join
   meeting.on("participant-joined", (participant) => {
     createParticipant(participant);
     participant.on("stream-enabled", (stream) => {
@@ -124,7 +145,7 @@ function startMeeting(token, meetingId, name) {
     });
   });
 
-  // participants left
+  //for any participant left
   meeting.on("participant-left", (participant) => {
     let vElement = document.querySelector(`#v-${participant.id}`);
     vElement.parentNode.removeChild(vElement);
@@ -135,22 +156,72 @@ function startMeeting(token, meetingId, name) {
     document.getElementById(`p-${participant.id}`).remove();
   });
 
-  meeting.localParticipant.on("stream-enabled", (stream) => {
-    setTrack(
-      stream,
-      localParticipant,
-      localParticipantAudio,
-      meeting.localParticipant.id
-    );
-  });
+  //remote participant joined
+
+  addDomEvents();
+
+  // meeting.join();
+  // participants = meeting.participants;
+  // console.log("meeting : ", meeting);
+
+  // createParticipant(meeting.localParticipant);
+
+  // meeting.on;
+  // //localParticipant Stream
+  // meeting.localParticipant.on("stream-enabled", (stream) => {
+  //   console.log(
+  //     "from local participant stream enable : ",
+  //     meeting.localParticipant.id
+  //   );
+  //   setTrack(
+  //     stream,
+  //     document.querySelector(`#v-${meeting.localParticipant.id}`),
+  //     document.getElementById(`#a-${meeting.localParticipant.id}`),
+  //     meeting.localParticipant.id
+  //   );
+  // });
+
+  // //participant joined
+  // meeting.on("participant-joined", (participant) => {
+  //   createParticipant(participant);
+  //   participant.on("stream-enabled", (stream) => {
+  //     console.log("Stream ENable : ", stream);
+  //     setTrack(
+  //       stream,
+  //       document.querySelector(`#v-${participant.id}`),
+  //       document.getElementById(`a-${participant.id}`),
+  //       participant.id
+  //     );
+  //   });
+  // });
+
+  // // participants left
+  // meeting.on("participant-left", (participant) => {
+  //   let vElement = document.querySelector(`#v-${participant.id}`);
+  //   vElement.parentNode.removeChild(vElement);
+  //   let aElement = document.getElementById(`a-${participant.id}`);
+  //   aElement.parentNode.removeChild(aElement);
+  //   participants = new Map(meeting.participants);
+  //   //remove it from participant list participantId;
+  //   document.getElementById(`p-${participant.id}`).remove();
+  // });
+
+  // meeting.localParticipant.on("stream-enabled", (stream) => {
+  //   setTrack(
+  //     stream,
+  //     localParticipant,
+  //     localParticipantAudio,
+  //     meeting.localParticipant.id
+  //   );
+  // });
 
   addDomEvents();
 }
 
 // creating video element
 function createVideoElement(id, name) {
-  let videoFrame = document.createElement("div");
-  videoFrame.classList.add("video-frame");
+  // let videoFrame = document.createElement("div");
+  // videoFrame.classList.add("video-frame");
 
   //create video
   let videoElement = document.createElement("video");
@@ -160,12 +231,12 @@ function createVideoElement(id, name) {
   videoFrame.appendChild(videoElement);
 
   //add overlay
-  let overlay = document.createElement("div");
-  overlay.classList.add("overlay");
-  overlay.innerHTML = `Name : ${name}`;
+  // let overlay = document.createElement("div");
+  // overlay.classList.add("overlay");
+  // overlay.innerHTML = `Name : ${name}`;
 
-  videoFrame.appendChild(overlay);
-  return videoFrame;
+  // videoFrame.appendChild(overlay);
+  return videoElement;
 }
 
 // creating audio element
