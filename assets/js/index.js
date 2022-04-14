@@ -176,63 +176,6 @@ function startMeeting(token, meetingId, name) {
   });
 
   addDomEvents();
-
-  // meeting.join();
-  // participants = meeting.participants;
-  // console.log("meeting : ", meeting);
-
-  // createParticipant(meeting.localParticipant);
-
-  // meeting.on;
-  // //localParticipant Stream
-  // meeting.localParticipant.on("stream-enabled", (stream) => {
-  //   console.log(
-  //     "from local participant stream enable : ",
-  //     meeting.localParticipant.id
-  //   );
-  //   setTrack(
-  //     stream,
-  //     document.querySelector(`#v-${meeting.localParticipant.id}`),
-  //     document.getElementById(`#a-${meeting.localParticipant.id}`),
-  //     meeting.localParticipant.id
-  //   );
-  // });
-
-  // //participant joined
-  // meeting.on("participant-joined", (participant) => {
-  //   createParticipant(participant);
-  //   participant.on("stream-enabled", (stream) => {
-  //     console.log("Stream ENable : ", stream);
-  //     setTrack(
-  //       stream,
-  //       document.querySelector(`#v-${participant.id}`),
-  //       document.getElementById(`a-${participant.id}`),
-  //       participant.id
-  //     );
-  //   });
-  // });
-
-  // // participants left
-  // meeting.on("participant-left", (participant) => {
-  //   let vElement = document.querySelector(`#v-${participant.id}`);
-  //   vElement.parentNode.removeChild(vElement);
-  //   let aElement = document.getElementById(`a-${participant.id}`);
-  //   aElement.parentNode.removeChild(aElement);
-  //   participants = new Map(meeting.participants);
-  //   //remove it from participant list participantId;
-  //   document.getElementById(`p-${participant.id}`).remove();
-  // });
-
-  // meeting.localParticipant.on("stream-enabled", (stream) => {
-  //   setTrack(
-  //     stream,
-  //     localParticipant,
-  //     localParticipantAudio,
-  //     meeting.localParticipant.id
-  //   );
-  // });
-
-  addDomEvents();
 }
 
 // creating video element
@@ -269,15 +212,7 @@ function createAudioElement(pId) {
 
 function setTrack(stream, videoElem, audioElement, id) {
   if (stream.kind == "video") {
-    enablePermission(id);
-    // const mediaStream = new MediaStream();
-    // mediaStream.addTrack(stream.track);
-    // videoElem.srcObject = mediaStream;
-    // videoElem
-    //   .play()
-    //   .catch((error) =>
-    //     console.error("videoElem.current.play() failed", error)
-    //   );
+    enablePermission();
     const mediaStream = new MediaStream();
     mediaStream.addTrack(stream.track);
     videoElem.srcObject = mediaStream;
