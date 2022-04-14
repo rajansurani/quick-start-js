@@ -131,6 +131,7 @@ function startMeeting(token, meetingId, name) {
 
     //local participant stream-enabled
     meeting.localParticipant.on("stream-enabled", (stream) => {
+      console.log("stream : ", stream);
       setTrack(
         stream,
         localParticipant,
@@ -212,7 +213,6 @@ function createAudioElement(pId) {
 
 function setTrack(stream, videoElem, audioElement, id) {
   if (stream.kind == "video") {
-    enablePermission();
     const mediaStream = new MediaStream();
     mediaStream.addTrack(stream.track);
     videoElem.srcObject = mediaStream;
