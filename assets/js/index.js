@@ -23,12 +23,6 @@ async function tokenValidation() {
   }
 }
 
-<<<<<<< Updated upstream
-async function meetingHandler(newMeeting) {
-  let joinMeetingName = "JS-SDK";
-  console.log(newMeeting);
-  tokenGeneration();
-=======
 function enablePermission() {
   navigator.mediaDevices
     .getUserMedia({
@@ -36,6 +30,18 @@ function enablePermission() {
       audio: true,
     })
     .then((stream) => {});
+}
+
+//createLocalParticipant
+function createParticipant(participant) {
+  let participantVideo = createVideoElement(
+    participant.id,
+    participant.displayName
+  );
+
+  let participantAudio = createAudioElement(participant.id);
+  videoContainer.appendChild(participantVideo);
+  videoContainer.appendChild(participantAudio);
 }
 
 async function meetingHandler(newMeeting) {
@@ -47,7 +53,6 @@ async function meetingHandler(newMeeting) {
   //token validation
   tokenValidation();
 
->>>>>>> Stashed changes
   if (newMeeting) {
     const url = `${API_BASE_URL}/api/meetings`;
     const options = {
@@ -87,14 +92,12 @@ function startMeeting(token, meetingId, name) {
   participants = meeting.participants;
   console.log("meeting : ", meeting);
 
-<<<<<<< Updated upstream
   //create Local Participant
 
-  if (totalParticipant == 0) {
-    createLocalParticipant();
-  }
+  // if (totalParticipant == 0) {
+  //   createLocalParticipant();
+  // }
 
-=======
   createParticipant(meeting.localParticipant);
 
   //localParticipant Stream
@@ -107,7 +110,6 @@ function startMeeting(token, meetingId, name) {
     );
   });
 
->>>>>>> Stashed changes
   //participant joined
   meeting.on("participant-joined", (participant) => {
     createParticipant(participant);
@@ -145,29 +147,6 @@ function startMeeting(token, meetingId, name) {
   addDomEvents();
 }
 
-//createLocalParticipant
-function createParticipant(participant) {
-  let participantVideo = createVideoElement(
-    participant.id,
-    participant.displayName
-  );
-<<<<<<< Updated upstream
-  localParticipantAudio = createAudioElement(meeting.localParticipant.id);
-
-  enablePermission(meeting.localParticipant.id);
-
-  addParticipantToList({
-    id: meeting.localParticipant.id,
-    displayName: meeting.localParticipant.displayName,
-  });
-  videoContainer.appendChild(localParticipant);
-=======
-  let participantAudio = createAudioElement(participant.id);
-  videoContainer.appendChild(participantVideo);
-  videoContainer.appendChild(participantAudio);
->>>>>>> Stashed changes
-}
-
 // creating video element
 function createVideoElement(id, name) {
   let videoFrame = document.createElement("div");
@@ -202,7 +181,6 @@ function createAudioElement(pId) {
 
 function setTrack(stream, videoElem, audioElement, id) {
   if (stream.kind == "video") {
-<<<<<<< Updated upstream
     enablePermission(id);
     // const mediaStream = new MediaStream();
     // mediaStream.addTrack(stream.track);
@@ -212,7 +190,6 @@ function setTrack(stream, videoElem, audioElement, id) {
     //   .catch((error) =>
     //     console.error("videoElem.current.play() failed", error)
     //   );
-=======
     const mediaStream = new MediaStream();
     mediaStream.addTrack(stream.track);
     videoElem.srcObject = mediaStream;
@@ -221,7 +198,6 @@ function setTrack(stream, videoElem, audioElement, id) {
       .catch((error) =>
         console.error("videoElem.current.play() failed", error)
       );
->>>>>>> Stashed changes
   }
   if (stream.kind == "audio") {
     if (id == meeting.localParticipant.id) return;
