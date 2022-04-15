@@ -158,8 +158,8 @@ function startMeeting(token, meetingId, name) {
       console.log("stream : ", stream);
       setTrack(
         stream,
-        localParticipant,
-        localParticipantAudio,
+        document.getElementById(`v-${meeting.localParticipant.id}`),
+        document.getElementById(`a-${meeting.localParticipant.id}`),
         meeting.localParticipant.id
       );
     });
