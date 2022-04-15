@@ -18,6 +18,16 @@ let localParticipantAudio = "";
 let webcamOn = true;
 let micOn = true;
 
+navigator.mediaDevices
+  .getUserMedia({
+    video: webcamOn,
+    audio: micOn,
+  })
+  .then((stream) => {
+    stream = stream;
+    console.log(stream);
+  });
+
 //handlers
 async function tokenValidation() {
   if (TOKEN != "") {
@@ -36,11 +46,6 @@ function createLocalParticipant() {
 }
 
 async function enablePermission() {
-  stream = await navigator.mediaDevices.getUserMedia({
-    video: webcamOn,
-    audio: micOn,
-  });
-
   // if (webcamOn) {
   //   stream = await navigator.mediaDevices.getUserMedia({
   //     video: true,
@@ -98,7 +103,7 @@ function createLocalParticipant(localParticipant) {
 async function meetingHandler(newMeeting) {
   let joinMeetingName = "JS-SDK";
 
-  enablePermission();
+  // enablePermission();
   //token validation
   tokenValidation();
 
@@ -204,15 +209,6 @@ function createVideoElement(id, name) {
   let videoElement = document.createElement("video");
   videoElement.classList.add("video");
   videoElement.setAttribute("id", `v-${id}`);
-  // videoElement.setAttribute("autoplay", true);
-  // videoFrame.appendChild(videoElement);
-
-  //add overlay
-  // let overlay = document.createElement("div");
-  // overlay.classList.add("overlay");
-  // overlay.innerHTML = `Name : ${name}`;
-
-  // videoFrame.appendChild(overlay);
   return videoElement;
 }
 
