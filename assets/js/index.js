@@ -15,6 +15,8 @@ let totalParticipant = 0;
 let stream = {};
 let localParticipantVideo = "";
 let localParticipantAudio = "";
+let webcamOn = true;
+let micOn = true;
 
 //handlers
 async function tokenValidation() {
@@ -35,9 +37,36 @@ function createLocalParticipant() {
 
 async function enablePermission() {
   stream = await navigator.mediaDevices.getUserMedia({
-    video: true,
-    audio: true,
+    video: webcamOn,
+    audio: micOn,
   });
+
+  // if (webcamOn) {
+  //   stream = await navigator.mediaDevices.getUserMedia({
+  //     video: true,
+  //     audio: false,
+  //   });
+  //   webcamOn = true;
+  // } else {
+  //   stream = await navigator.mediaDevices.getUserMedia({
+  //     video: false,
+  //     audio: true,
+  //   });
+  //   webcamOn = false;
+  // }
+  // if (micOn) {
+  //   stream = await navigator.mediaDevices.getUserMedia({
+  //     video: true,
+  //     audio: true,
+  //   });
+  //   micOn = true;
+  // } else {
+  //   stream = await navigator.mediaDevices.getUserMedia({
+  //     video: false,
+  //     audio: true,
+  //   });
+  //   micOn = false;
+  // }
 }
 
 //createLocalParticipant
@@ -104,19 +133,8 @@ function startMeeting(token, meetingId, name) {
   meeting = window.ZujoSDK.initMeeting({
     meetingId: meetingId, // required
     name: name, // required
-    micEnabled: true, // optional, default: true
-    webcamEnabled: true, // optional, default: true
-    maxResolution: "hd", // optional, default: "hd"
-  });
-
-  window.ZujoSDK.config(token);
-
-  // Meeting Init
-  meeting = window.ZujoSDK.initMeeting({
-    meetingId: meetingId, // required
-    name: name, // required
-    micEnabled: true, // optional, default: true
-    webcamEnabled: true, // optional, default: true
+    micEnabled: micOn, // optional, default: true
+    webcamEnabled: webcamOn, // optional, default: true
     maxResolution: "hd", // optional, default: "hd"
   });
 
@@ -182,14 +200,11 @@ function startMeeting(token, meetingId, name) {
 
 // creating video element
 function createVideoElement(id, name) {
-  // let videoFrame = document.createElement("div");
-  // videoFrame.classList.add("video-frame");
-
   //create video
   let videoElement = document.createElement("video");
   videoElement.classList.add("video");
   videoElement.setAttribute("id", `v-${id}`);
-  videoElement.setAttribute("autoplay", true);
+  // videoElement.setAttribute("autoplay", true);
   // videoFrame.appendChild(videoElement);
 
   //add overlay
@@ -213,6 +228,7 @@ function createAudioElement(pId) {
 }
 
 function setTrack(stream, videoElem, audioElement, id) {
+  console.log("from setTrack");
   if (stream.kind == "video") {
     const mediaStream = new MediaStream();
     mediaStream.addTrack(stream.track);
