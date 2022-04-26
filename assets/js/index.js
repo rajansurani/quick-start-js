@@ -79,8 +79,8 @@ function createLocalParticipant(localParticipant) {
 async function meetingHandler(newMeeting) {
   let joinMeetingName = "JS-SDK";
 
+  token = await getToken();
   if (newMeeting) {
-    token = await getToken();
     meetingId = await getMeetingId(token);
     document.getElementById("lblMeetingId").value = "Meeting ID : " + meetingId;
     document.getElementById("join-screen").style.display = "none";
@@ -98,7 +98,8 @@ async function meetingHandler(newMeeting) {
 function startMeeting(token, meetingId, name) {
   // Meeting config
   window.ZujoSDK.config(token);
-
+  console.log('token', token);
+  console.log("meetingId", meetingId);
   // Meeting Init
   meeting = window.ZujoSDK.initMeeting({
     meetingId: meetingId, // required
@@ -142,12 +143,6 @@ function startMeeting(token, meetingId, name) {
     //local participant stream-disabled
     meeting.localParticipant.on("stream-disabled", (stream) => {
       console.log("local participant stream disabled");
-      setTrack(
-        stream,
-        document.getElementById(`v-${meeting.localParticipant.id}`),
-        document.getElementById(`a-${meeting.localParticipant.id}`),
-        meeting.localParticipant.id
-      );
     });
   });
 
@@ -158,7 +153,7 @@ function startMeeting(token, meetingId, name) {
       console.log("Stream ENable : ", stream);
       setTrack(
         stream,
-        document.querySelector(`v-${participant.id}`),
+        document.getElementById(`v-${participant.id}`),
         document.getElementById(`a-${participant.id}`),
         participant.id
       );
@@ -182,9 +177,13 @@ function startMeeting(token, meetingId, name) {
 // creating video element
 function createVideoElement(id, name) {
   //create video
+  let div = document.createElement("div");
+  // div.classList.add("col-8");
   let videoElement = document.createElement("video");
   videoElement.classList.add("video");
+  videoElement.classList.add("col-4");
   videoElement.setAttribute("id", `v-${id}`);
+  div.appendChild(videoElement);
   return videoElement;
 }
 

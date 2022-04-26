@@ -35,6 +35,7 @@ input[type="text"] {
 
 #videoContainer {
   margin-top: 20px;
+  width: 100%;
 }
 
 .video-frame {
@@ -50,8 +51,8 @@ input[type="text"] {
 }
 
 .video {
-  width: 100%;
-  max-height: 100%;
+  /* width: 100%; */
+  /* max-height: 100%; */
   border: 1px solid grey;
   border-radius: 10px;
   transform: rotate("90");
