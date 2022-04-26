@@ -24,7 +24,7 @@
     <!--join-screen-->
     <div
       id="join-screen"
-      class="flex flex-row align-items-center justify-content-center h-100"
+      class="flex align-items-center justify-content-center h-100"
     >
       <button
         class="btn btn-primary"
@@ -56,17 +56,19 @@
           id="lblMeetingId"
           readonly
         />
-        <button class="btn btn-dark" id="btnToggleMic">Unmute Mic</button>
+        <button class="btn btn-dark" id="btnToggleMic">Mute Mic</button>
         <button class="btn btn-dark" id="btnToggleWebCam">
           Disable Webcam
         </button>
         <button class="btn btn-dark" id="btnLeaveMeeting">Leave Meeting</button>
       </div>
       <br />
-      <div id="videoContainer" class="d-flex flex-row"></div>
+      <div id="videoContainer"></div>
+      <!-- <div id="videoContainer" class="d-flex flex-row"></div> -->
     </div>
-    <script src="./js/config.js"></script>
+    <!-- <script src="./js/config.js"></script> -->
     <script src="./js/index.js"></script>
+    <script src="./js/api.js"></script>
     <script src="https://sdk.videosdk.live/js-sdk/0.0.20/videosdk.js"></script>
   </body>
 </html>

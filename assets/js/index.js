@@ -17,61 +17,37 @@ let localParticipantVideo = "";
 let localParticipantAudio = "";
 let webcamOn = true;
 let micOn = true;
-
-navigator.mediaDevices
-  .getUserMedia({
-    video: webcamOn,
-    audio: micOn,
-  })
-  .then((stream) => {
-    stream = stream;
-    console.log(stream);
-  });
+let participants = {};
 
 //handlers
-async function tokenValidation() {
-  if (TOKEN != "") {
-    token = TOKEN;
-    console.log("token : ", token);
-  } else {
-    alert("Please Provide Your Token First");
-  }
-}
+// async function tokenValidation() {
+//   if (TOKEN != "") {
+//     token = TOKEN;
+//     console.log("token : ", token);
+//   } else {
+//     alert("Please Provide Your Token First");
+//   }
+// }
+
+// async function createMeeting() {
+//   const url = `${API_BASE_URL}/api/meetings`;
+//   const options = {
+//     method: "POST",
+//     headers: { Authorization: token, "Content-Type": "application/json" },
+//   };
+
+//   const { meetingId } = await fetch(url, options)
+//     .then((response) => response.json())
+//     .catch((error) => alert("error", error));
+
+//   return meetingId;
+// }
 
 function createLocalParticipant() {
   localParticipant = createVideoElement(meeting.localParticipant.id);
   console.log("video : ", localParticipant);
   localParticipantAudio = createAudioElement(meeting.localParticipant.id);
   videoContainer.appendChild(localParticipant);
-}
-
-async function enablePermission() {
-  // if (webcamOn) {
-  //   stream = await navigator.mediaDevices.getUserMedia({
-  //     video: true,
-  //     audio: false,
-  //   });
-  //   webcamOn = true;
-  // } else {
-  //   stream = await navigator.mediaDevices.getUserMedia({
-  //     video: false,
-  //     audio: true,
-  //   });
-  //   webcamOn = false;
-  // }
-  // if (micOn) {
-  //   stream = await navigator.mediaDevices.getUserMedia({
-  //     video: true,
-  //     audio: true,
-  //   });
-  //   micOn = true;
-  // } else {
-  //   stream = await navigator.mediaDevices.getUserMedia({
-  //     video: false,
-  //     audio: true,
-  //   });
-  //   micOn = false;
-  // }
 }
 
 //createLocalParticipant
@@ -103,20 +79,9 @@ function createLocalParticipant(localParticipant) {
 async function meetingHandler(newMeeting) {
   let joinMeetingName = "JS-SDK";
 
-  // enablePermission();
-  //token validation
-  tokenValidation();
-
   if (newMeeting) {
-    const url = `${API_BASE_URL}/api/meetings`;
-    const options = {
-      method: "POST",
-      headers: { Authorization: token, "Content-Type": "application/json" },
-    };
-
-    const { meetingId } = await fetch(url, options)
-      .then((response) => response.json())
-      .catch((error) => alert("error", error));
+    token = await getToken();
+    meetingId = await getMeetingId(token);
     document.getElementById("lblMeetingId").value = "Meeting ID : " + meetingId;
     document.getElementById("join-screen").style.display = "none";
     document.getElementById("grid-screen").style.display = "inline-block";
@@ -142,6 +107,17 @@ function startMeeting(token, meetingId, name) {
     webcamEnabled: webcamOn, // optional, default: true
     maxResolution: "hd", // optional, default: "hd"
   });
+
+  if (meeting.micOn || meeting.webcamOn) {
+    navigator.mediaDevices
+      .getUserMedia({
+        video: webcamOn,
+        audio: micOn,
+      })
+      .then((stream) => {
+        stream = stream;
+      });
+  }
 
   //join meeting
   meeting.join();
@@ -182,7 +158,7 @@ function startMeeting(token, meetingId, name) {
       console.log("Stream ENable : ", stream);
       setTrack(
         stream,
-        document.querySelector(`#v-${participant.id}`),
+        document.querySelector(`v-${participant.id}`),
         document.getElementById(`a-${participant.id}`),
         participant.id
       );
